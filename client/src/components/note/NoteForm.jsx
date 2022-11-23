@@ -15,9 +15,12 @@ const NoteForm = ({ handleClose }) => {
         title: titleRef.current.value,
         body: bodyRef.current.value,
       },
-    }).then(() => {
+    }).then((response) => {
       resetForm();
-      toast.success("saved.");
+      toast.success("Note saved.");
+    }).catch((error) => {
+      console.log(error)
+      toast.error(error.response.data.message);
     });
   };
 
@@ -32,10 +35,10 @@ const NoteForm = ({ handleClose }) => {
         <div className="mb-2">
           <div className="flex flex-row justify-between">
             <p className="text-white font-semibold mb-2">Title</p>
-            <div className="cursor-pointer hover:font-bold" onClick={resetForm}>
-              <FontAwesomeIcon icon="trash" />
+            <button className="cursor-pointer hover:font-bold mb-2" onClick={(e) => { e.preventDefault(); resetForm(); }}>
+              <FontAwesomeIcon icon="trash-can" />
               <span className="px-3">Reset</span>
-            </div>
+            </button>
           </div>
           <input
             type="text"

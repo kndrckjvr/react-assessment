@@ -6,7 +6,10 @@ const Note = require("../models/notes");
 const getNote = async (request, response, next) => {
   let note;
   try {
-    note = await Note.findOne({"uid": request.params.id});
+    note = await Note.findOne({
+      deleted_at: null,
+      uid: request.params.id,
+    });
     if (note == null) {
       return response.status(404).json({ message: "cannot find note" });
     }
@@ -21,7 +24,17 @@ const getNote = async (request, response, next) => {
 // get notes
 router.get("/", async (request, response) => {
   try {
-    const notes = await Note.find();
+    let find = {
+      deleted_at: null,
+    };
+
+    if (request.query.search) {
+        find.title = `/${request.query.search}/`;
+    }
+
+    console.log(find);
+
+    const notes = await Note.find(find).sort({ created_at: -1 });
 
     response.json(notes);
   } catch (error) {
@@ -37,7 +50,6 @@ router.get("/:id", getNote, (request, response) => {
 // store notes
 router.post("/", async (request, response) => {
   let data = { ...request.body };
-  console.log(data);
 
   const note = new Note({
     uid: uuidv4(),

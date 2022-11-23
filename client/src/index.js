@@ -3,16 +3,10 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import Router from "./components/Router";
 import reportWebVitals from "./reportWebVitals";
-import {
-  faHouse,
-  faMagnifyingGlass,
-  faGear,
-  faPlus,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faMagnifyingGlass, faPen, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 
-library.add(faHouse, faMagnifyingGlass, faGear, faPlus, faTrash);
+library.add(faHouse, faMagnifyingGlass, faTrashCan, faPen);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

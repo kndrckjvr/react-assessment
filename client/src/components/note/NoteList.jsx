@@ -1,33 +1,37 @@
 import axios from "axios";
+import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Loading from "../Loading";
 import Note from "./Note";
 
-const NoteList = () => {
-  const [notes, setNotes] = useState([]);
+const NoteList = ({ search, searchList = false }) => {
+  const [notes, setNotes] = useState(null);
 
   useEffect(() => {
-    getNotes();
-  }, []);
-
-  const getNotes = () => {
-    axios({
-      method: "get",
-      url: "/api/notes",
-      data: {
-        total: 10,
-      },
-    })
+    axios
+      .get("/api/notes", {
+        params: {
+          search: search,
+        },
+      })
       .then((response) => {
         setNotes(response.data);
       })
       .catch((error) => {
-        toast.error(error.message);
+        toast.error(error.response.data.message);
       });
-  };
+  }, []);
+
+  if (!notes) return <Loading />;
 
   return (
-    <div className="inline-block h-[94vh] w-full overflow-y-auto note-list">
+    <div
+      className={classNames("inline-block w-full overflow-y-auto note-list", {
+        "h-[94vh]": !searchList,
+        "h-[87.2vh]": searchList,
+      })}
+    >
       {notes.map((note, index) => (
         <Note
           uid={note.uid}
