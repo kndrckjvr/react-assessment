@@ -27,7 +27,7 @@ const Note = ({ uid, title, date, body, type }) => {
               </svg>
             </div>
           </div>
-          <div className="mt-1 mb-2 px-2">{body}</div>
+          <div className="mt-1 mb-2 px-2 max-w-2xl break-words">{body}</div>
         </div>
       </div>
       {/* <div className="flex flex-row justify-between">
