@@ -1,13 +1,25 @@
 import { Outlet } from "react-router-dom";
 import "./App.css";
+import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
-let App = () => {
+const App = () => {
   return (
     <div className="container mx-auto flex flex-row">
       <Sidebar></Sidebar>
-      <div></div>
-      <Outlet></Outlet>
+      <div className="container basis-2/4 border-r-[1px] border-r-slate-700">
+        <Header></Header>
+        <Outlet></Outlet>
+      </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        closeOnClick
+        pauseOnHover
+        theme="dark"
+      />
     </div>
   );
 };

@@ -1,4 +1,18 @@
 body {
     background-color: black;
     color: #fff;
+	font-family: Product Sans;
+}
+
+.note-list::-webkit-scrollbar-track {
+    border-radius: 4px;
+}
+
+.note-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.note-list::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #555;
 }
