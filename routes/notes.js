@@ -90,6 +90,10 @@ router.patch("/:id", getNote, async (request, response) => {
 
 // delete
 router.delete("/:id", getNote, async (request, response) => {
+  if (response.note.deleted_at != null) {
+    response.status(400).json({ message: "you have already deleted this." });
+  }
+
   response.note.deleted_at = new Date();
 
   try {

@@ -8,6 +8,8 @@ const initialState = {
   isLoading: true,
   editNoteId: null,
   viewNoteData: null,
+  isViewLoading: true,
+  deleteNoteId: null,
 };
 
 export const getNotes = createAsyncThunk(
@@ -23,7 +25,7 @@ export const getNotes = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error(error.message);
-      return thunkApi.rejectWithValue("something went wrong");
+      return thunkApi.rejectWithValue(error.response);
     }
   }
 );
@@ -37,7 +39,21 @@ export const getNote = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error(error.message);
-      return thunkApi.rejectWithValue("something went wrong");
+      return thunkApi.rejectWithValue(error.response);
+    }
+  }
+);
+
+export const deleteNote = createAsyncThunk(
+  "note/deleteNote",
+  async (id, thunkApi) => {
+    try {
+      const response = await axios.delete(`/api/note/${id}`);
+
+      return response.data;
+    } catch (error) {
+      console.error(error.message);
+      return thunkApi.rejectWithValue(error.response);
     }
   }
 );
@@ -49,6 +65,9 @@ const noteSlice = createSlice({
     toggleLoading: (state, action) => {
       state.isLoading = action.payload;
     },
+    toggleViewLoading: (state, action) => {
+      state.isViewLoading = action.payload;
+    },
     setNotes: (state, { payload }) => {
       state.noteItems = payload;
     },
@@ -57,6 +76,9 @@ const noteSlice = createSlice({
     },
     setViewNote: (state, { payload }) => {
       state.viewNoteData = payload;
+    },
+    setDeleteNoteId: (state, { payload }) => {
+      state.deleteNoteId = payload;
     },
   },
   extraReducers: (builder) => {
@@ -74,13 +96,28 @@ const noteSlice = createSlice({
       })
       .addCase(getNote.fulfilled, (state, action) => {
         state.viewNoteData = action.payload;
+        state.isViewLoading = false;
       })
       .addCase(getNote.rejected, (state, { payload }) => {
+        state.isLoading = false;
+      })
+      .addCase(deleteNote.fulfilled, (state) => {
+        state.deleteNoteId = null;
+        toast.success("Note has been deleted");
+      })
+      .addCase(deleteNote.rejected, (state, { payload }) => {
         toast.error(payload.message);
       });
   },
 });
 
-export const { toggleLoading, setNotes, setEditNoteId, setViewNote } = noteSlice.actions;
+export const {
+  toggleLoading,
+  setNotes,
+  setEditNoteId,
+  setViewNote,
+  setDeleteNoteId,
+  toggleViewLoading,
+} = noteSlice.actions;
 
 export default noteSlice.reducer;

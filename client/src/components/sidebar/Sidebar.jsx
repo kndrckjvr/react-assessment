@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { closeModal, openModal } from "../../app/features/modal/formModalSlice";
+import { closeFormModal, openFormModal } from "../../app/features/modal/formModalSlice";
+import { setEditNoteId } from "../../app/features/note/noteSlice";
 import Modal from "../Modal";
 import NoteForm from "../note/NoteForm";
 import SidebarLinks from "./SidebarLinks";
@@ -22,11 +22,12 @@ const Sidebar = () => {
   ];
 
   const createNewPost = () => {
-    dispatch(openModal());
+    dispatch(openFormModal());
   };
 
   const handleClose = () => {
-    dispatch(closeModal());
+    dispatch(closeFormModal());
+    dispatch(setEditNoteId(null));
   };
 
   return (

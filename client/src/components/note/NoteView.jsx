@@ -10,30 +10,36 @@ import Modal from "../Modal";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getNote,
+  setDeleteNoteId,
   setEditNoteId,
   setViewNote,
+  toggleViewLoading,
 } from "../../app/features/note/noteSlice";
-import { openModal } from "../../app/features/modal/formModalSlice";
-import DeleteModal from "./DeleteModal";
+import { openFormModal } from "../../app/features/modal/formModalSlice";
+import NotFound from "../NotFound";
+import { openDeleteModal } from "../../app/features/modal/deleteModalSlice";
 
 const NoteView = () => {
   const dispatch = useDispatch();
-  const { viewNoteData } = useSelector((state) => state.note);
+  const { isViewLoading, viewNoteData } = useSelector((state) => state.note);
   const { id } = useParams();
-  const [deleteModal, setDeleteModal] = useState(false);
-
-  const handleClose = () => {
-    setDeleteModal(false);
-  };
 
   const editNote = (e, uid) => {
     e.stopPropagation();
 
     dispatch(setEditNoteId(uid));
-    dispatch(openModal());
+    dispatch(openFormModal());
+  };
+
+  const deleteNote = (e, uid) => {
+    e.stopPropagation();
+
+    dispatch(setDeleteNoteId(uid));
+    dispatch(openDeleteModal());
   };
 
   useEffect(() => {
+    dispatch(toggleViewLoading(true));
     dispatch(getNote(id));
 
     return () => {
@@ -41,9 +47,11 @@ const NoteView = () => {
     };
   }, []);
 
-  if (!viewNoteData) return <Loading />;
-
-  return (
+  return isViewLoading ? (
+    <Loading />
+  ) : viewNoteData == null ? (
+    <NotFound />
+  ) : (
     <div className="p-8 max-w-full">
       <div className="flex flex-column">
         <div className="flex flex-row mb-4">
@@ -62,7 +70,7 @@ const NoteView = () => {
         {dayjs(viewNoteData.created_at).format("h:mm A · MMM D, YYYY")} ·
         ReactJS Assessment{" "}
         {viewNoteData.updated_at != null
-          ? `· Last Edited: ${dayjs(viewNoteData.created_at).format(
+          ? `· Last Edited: ${dayjs(viewNoteData.updated_at).format(
               "MMM D, YYYY h:mm A"
             )}`
           : null}
@@ -80,16 +88,13 @@ const NoteView = () => {
         <button
           type="button"
           className="hover:text-slate-400 cursor-pointer"
-          onClick={() => setDeleteModal(true)}
+          onClick={(e) => {
+            deleteNote(e, id);
+          }}
         >
           <FontAwesomeIcon icon="trash-can" />
         </button>
       </div>
-      <DeleteModal
-        deleteModal={deleteModal}
-        handleClose={handleClose}
-        uid={id}
-      />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Sidebar from "./components/sidebar/Sidebar";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import DeleteModal from "./components/note/DeleteModal";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         pauseOnHover
         theme="dark"
       />
+      <DeleteModal />
     </div>
   );
 };

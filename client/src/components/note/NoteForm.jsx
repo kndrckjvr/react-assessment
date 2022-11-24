@@ -18,7 +18,8 @@ const NoteForm = ({ handleClose }) => {
   const [body, setBody] = useState("");
   const [titleError, setTitleError] = useState(false);
   const [bodyError, setBodyError] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
+  // const [wordCount, setWordCount] = useState(0);
+  const [characterCount, setCharacterCount] = useState(0);
 
   useEffect(() => {
     if (editNoteId != null) {
@@ -32,18 +33,20 @@ const NoteForm = ({ handleClose }) => {
         .catch((error) => {
           toast.error(error.message);
         });
+    } else {
+      resetForm();
     }
   }, [editNoteId]);
 
   const submitForm = () => {
-    validateInputs();
-
-    if (titleError) {
+    if (title === "") {
+      setTitleError(true);
       toast.error("Title is required.");
       return;
     }
 
-    if (bodyError) {
+    if (body === "" || characterCount > 200) {
+      setBodyError(true);
       toast.error("Word Limit has been reached.");
       return;
     }
@@ -60,11 +63,11 @@ const NoteForm = ({ handleClose }) => {
         resetForm();
         handleClose();
         dispatch(getNotes());
-        dispatch(setEditNoteId(null));
 
         // if view note is not null refresh data
-        if (viewNoteData !== null) {
+        if (viewNoteData !== null && editNoteId !== null) {
           dispatch(setViewNote(response.data));
+          dispatch(setEditNoteId(null));
         }
 
         toast.success(editNoteId == null ? "Note saved." : "Note updated.");
@@ -77,32 +80,23 @@ const NoteForm = ({ handleClose }) => {
   const resetForm = () => {
     setTitle("");
     setBody("");
-    setWordCount(0);
+    // setWordCount(0);
+    setCharacterCount(0);
     setTitleError(false);
     setBodyError(false);
   };
 
-  const checkWordCount = (e) => {
+  const checkBodyInput = (e) => {
     let bodyValue = e.target.value;
 
     setBody(bodyValue);
-    setWordCount(bodyValue === "" ? 0 : bodyValue.split(" ").length);
-  };
-
-  const validateInputs = () => {
-    setTitleError(!title);
-    setBodyError(!body || wordCount > 200);
+    // setWordCount(bodyValue === "" ? 0 : bodyValue.split(" ").length);
+    setCharacterCount(bodyValue === "" ? 0 : bodyValue.length);
   };
 
   return (
     <div>
-      <form
-        className="w-full flex flex-col"
-        onBlur={() => {
-          setTitleError(false);
-          setBodyError(false);
-        }}
-      >
+      <form className="w-full flex flex-col">
         <div className="mb-2">
           <div className="flex flex-row justify-between">
             <label className="text-white font-semibold mb-2">Title</label>
@@ -135,21 +129,21 @@ const NoteForm = ({ handleClose }) => {
             Note
             <span
               className={classNames("ml-auto text-xs self-center", {
-                "text-amber-600": wordCount >= 150,
-                "text-red-600": wordCount > 200,
+                "text-amber-600": characterCount >= 150,
+                "text-red-600": characterCount > 200,
               })}
             >
-              {wordCount}/200
+              {characterCount}/200
             </span>
           </label>
           <textarea
-            aria-label="Type your notes here..."
+            aria-label="Body"
             className={classNames("textarea w-full", {
               "input-error": bodyError,
             })}
             value={body}
-            onChange={(e) => checkWordCount(e)}
-            placeholder="Bio"
+            onChange={(e) => checkBodyInput(e)}
+            placeholder="Type your notes here..."
           ></textarea>
         </div>
       </form>
