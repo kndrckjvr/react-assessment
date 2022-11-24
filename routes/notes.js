@@ -31,7 +31,7 @@ router.get("/", async (request, response) => {
     if (request.query.search) {
       find.title = {
         $regex: `.*${request.query.search}.*`,
-        $options: 'i'
+        $options: "i",
       };
     }
 
@@ -67,9 +67,37 @@ router.post("/", async (request, response) => {
 });
 
 // patch notes
-router.patch("/", (request, response) => {});
+router.patch("/:id", getNote, async (request, response) => {
+  let note = response.note;
+  let body = { ...request.body };
+
+  note.updated_at = new Date();
+  if (body.title != null) {
+    note.title = body.title;
+  }
+  
+  if (body.body != null) {
+    note.body = body.body;
+  }
+
+  try {
+    const updatedNote = await note.save();
+    response.json(updatedNote);
+  } catch (error) {
+    response.status(500).json({ message: error.message });
+  }
+});
 
 // delete
-router.delete("/:id", (request, response) => {});
+router.delete("/:id", getNote, async (request, response) => {
+  response.note.deleted_at = new Date();
+
+  try {
+    const updatedNote = await response.note.save();
+    response.json(updatedNote);
+  } catch (error) {
+    response.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;

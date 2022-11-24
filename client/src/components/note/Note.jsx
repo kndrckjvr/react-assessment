@@ -1,9 +1,14 @@
 import imagePlaceholder from "../../images/edit-placeholder.png";
 import * as dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setEditNoteId } from "../../app/features/note/noteSlice";
+import { openModal } from "../../app/features/modal/formModalSlice";
 
-const Note = ({ uid, title, date, body, type }) => {
+const Note = ({ uid, title, created_at, updated_at, body, type }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const viewNote = (e, uid) => {
     e.stopPropagation();
     navigate(`/view/${uid}`);
@@ -11,7 +16,8 @@ const Note = ({ uid, title, date, body, type }) => {
 
   const editNote = (e, uid) => {
     e.stopPropagation();
-    navigate(`/view/${uid}`);
+    dispatch(setEditNoteId(uid));
+    dispatch(openModal());
   };
 
   return (
@@ -25,6 +31,7 @@ const Note = ({ uid, title, date, body, type }) => {
         <div className="flex flex-col w-full">
           <div className="flex flex-row items-center ml-2">
             <button
+              type="button"
               className="text-s truncate max-w-[500px] hover:underline cursor-pointer"
               onClick={(e) => viewNote(e, uid)}
             >
@@ -32,7 +39,7 @@ const Note = ({ uid, title, date, body, type }) => {
             </button>
             <div className="px-2">·</div>
             <span className="text-xs font-bold text-slate-500">
-              {dayjs(date).format("YYYY/MM/DD HH:mm:ss")}
+              {dayjs(created_at).format("YYYY/MM/DD HH:mm:ss")}
             </span>
 
             <div className="dropdown dropdown-end ml-auto">
@@ -52,6 +59,7 @@ const Note = ({ uid, title, date, body, type }) => {
               >
                 <li>
                   <button
+                    type="button"
                     className="active:bg-slate-300"
                     onClick={(e) => viewNote(e, uid)}
                   >
@@ -60,6 +68,7 @@ const Note = ({ uid, title, date, body, type }) => {
                 </li>
                 <li>
                   <button
+                    type="button"
                     className="active:bg-slate-300"
                     onClick={(e) => editNote(e, uid)}
                   >

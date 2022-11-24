@@ -1,15 +1,39 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getNotes,
+  setEditNoteId,
+  setViewNote,
+} from "../../app/features/note/noteSlice";
 
 const NoteForm = ({ handleClose }) => {
+  const { editNoteId, viewNoteData } = useSelector((state) => state.note);
+  const dispatch = useDispatch();
+
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [titleError, setTitleError] = useState(false);
   const [bodyError, setBodyError] = useState(false);
   const [wordCount, setWordCount] = useState(0);
+
+  useEffect(() => {
+    if (editNoteId != null) {
+      axios
+        .get(`/api/note/${editNoteId}`)
+        .then((response) => {
+          let data = response.data;
+          setTitle(data.title);
+          setBody(data.body);
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
+    }
+  }, [editNoteId]);
 
   const submitForm = () => {
     validateInputs();
@@ -25,8 +49,8 @@ const NoteForm = ({ handleClose }) => {
     }
 
     axios({
-      method: "post",
-      url: "/api/notes",
+      method: editNoteId == null ? "post" : "patch",
+      url: editNoteId == null ? "/api/note" : `/api/note/${editNoteId}`,
       data: {
         title: title,
         body: body,
@@ -34,7 +58,16 @@ const NoteForm = ({ handleClose }) => {
     })
       .then((response) => {
         resetForm();
-        toast.success("Note saved.");
+        handleClose();
+        dispatch(getNotes());
+        dispatch(setEditNoteId(null));
+
+        // if view note is not null refresh data
+        if (viewNoteData !== null) {
+          dispatch(setViewNote(response.data));
+        }
+
+        toast.success(editNoteId == null ? "Note saved." : "Note updated.");
       })
       .catch((error) => {
         toast.error(error.response.data.message);
@@ -74,9 +107,9 @@ const NoteForm = ({ handleClose }) => {
           <div className="flex flex-row justify-between">
             <label className="text-white font-semibold mb-2">Title</label>
             <button
+              type="button"
               className="cursor-pointer hover:font-bold mb-2"
               onClick={(e) => {
-                e.preventDefault();
                 resetForm();
               }}
             >
@@ -122,12 +155,14 @@ const NoteForm = ({ handleClose }) => {
       </form>
       <div className="flex flex-row mt-2 justify-between">
         <button
+          type="button"
           className="w-[48%] rounded-full py-2 text-black font-bold bg-slate-300 hover:bg-slate-400"
           onClick={handleClose}
         >
           Close
         </button>
         <button
+          type="button"
           className="w-[48%] rounded-full py-2 text-white font-bold bg-[#1d9bf0] hover:bg-[#1a8cd8]"
           onClick={submitForm}
         >

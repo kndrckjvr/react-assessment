@@ -1,29 +1,20 @@
 import axios from "axios";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getNotes } from "../../app/features/note/noteSlice";
 import Loading from "../Loading";
 import Note from "./Note";
 
 const NoteList = ({ search, searchList = false }) => {
-  const [notes, setNotes] = useState(null);
+  const dispatch = useDispatch();
+  const { noteItems, isLoading } = useSelector((state) => state.note);
 
   useEffect(() => {
-    axios
-      .get("/api/notes", {
-        params: {
-          search: search,
-        },
-      })
-      .then((response) => {
-        setNotes(response.data);
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
-  }, [search]);
+    dispatch(getNotes(search));
+  }, [search, dispatch]);
 
-  if (!notes) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return (
     <div
@@ -32,20 +23,11 @@ const NoteList = ({ search, searchList = false }) => {
         "h-[86.81vh]": searchList,
       })}
     >
-      {notes.length === 0 ? (
-        <div className="mt-4 text-center text-white">
-          No notes found...
-        </div>
+      {noteItems.length === 0 ? (
+        <div className="mt-4 text-center text-white">No notes found...</div>
       ) : (
-        notes.map((note, index) => (
-          <Note
-            uid={note.uid}
-            title={note.title}
-            body={note.body}
-            date={note.created_at}
-            type={1}
-            key={note.uid}
-          />
+        noteItems.map((note, index) => (
+          <Note {...note} type={1} key={note.uid} />
         ))
       )}
     </div>

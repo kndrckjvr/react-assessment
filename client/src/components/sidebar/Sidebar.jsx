@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal, openModal } from "../../app/features/modal/formModalSlice";
 import Modal from "../Modal";
 import NoteForm from "../note/NoteForm";
 import SidebarLinks from "./SidebarLinks";
 
 const Sidebar = () => {
-  const [modalOpen, setModalOpen] = useState(false);
+  const dispatch = useDispatch();
+  const { isModalOpen } = useSelector((state) => state.formModal);
   const links = [
     {
       title: "Home",
@@ -19,11 +22,11 @@ const Sidebar = () => {
   ];
 
   const createNewPost = () => {
-    setModalOpen(true);
+    dispatch(openModal());
   };
 
   const handleClose = () => {
-    setModalOpen(false);
+    dispatch(closeModal());
   };
 
   return (
@@ -41,6 +44,7 @@ const Sidebar = () => {
             ))}
           </ul>
           <button
+            type="button"
             className="py-4 w-11/12 rounded-full font-bold bg-[#1d9bf0] hover:bg-[#1a8cd8] self-center"
             onClick={createNewPost}
           >
@@ -49,7 +53,7 @@ const Sidebar = () => {
         </div>
       </div>
       <Modal
-        isModalOpen={modalOpen}
+        isModalOpen={isModalOpen}
         handleClose={handleClose}
         enableClickAway={true}
       >

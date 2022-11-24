@@ -22,7 +22,7 @@ app.use(express.static(path.resolve(__dirname, "../client/build")));
 
 app.use(express.json());
 
-app.use("/api/notes", notes);
+app.use("/api/note", notes);
 
 app.all("*", (request, response) => {
   response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));

@@ -7,9 +7,18 @@ import imagePlaceholder from "../../images/edit-placeholder.png";
 import Loading from "../Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Modal from "../Modal";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getNote,
+  setEditNoteId,
+  setViewNote,
+} from "../../app/features/note/noteSlice";
+import { openModal } from "../../app/features/modal/formModalSlice";
+import DeleteModal from "./DeleteModal";
 
 const NoteView = () => {
-  const [note, setNote] = useState(null);
+  const dispatch = useDispatch();
+  const { viewNoteData } = useSelector((state) => state.note);
   const { id } = useParams();
   const [deleteModal, setDeleteModal] = useState(false);
 
@@ -17,18 +26,22 @@ const NoteView = () => {
     setDeleteModal(false);
   };
 
+  const editNote = (e, uid) => {
+    e.stopPropagation();
+
+    dispatch(setEditNoteId(uid));
+    dispatch(openModal());
+  };
+
   useEffect(() => {
-    axios
-      .get(`/api/notes/${id}`)
-      .then((response) => {
-        setNote(response.data);
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
+    dispatch(getNote(id));
+
+    return () => {
+      dispatch(setViewNote(null));
+    };
   }, []);
 
-  if (!note) return <Loading />;
+  if (!viewNoteData) return <Loading />;
 
   return (
     <div className="p-8 max-w-full">
@@ -39,47 +52,44 @@ const NoteView = () => {
             alt=""
             className="rounded-full h-14 w-14 inline-block mr-2"
           />
-          <div className="text-3xl mb-2">{note.title}</div>
+          <div className="text-3xl mb-2">{viewNoteData.title}</div>
         </div>
       </div>
       <div className="mx-auto">
-        <div className="max-w-2xl break-words text-lg">{note.body}</div>
+        <div className="max-w-2xl break-words text-lg">{viewNoteData.body}</div>
       </div>
       <div className="text-slate-300 py-4">
-        {dayjs(note.created_at).format("h:mm A · MMM D, YYYY")} · ReactJS
-        Assessment
+        {dayjs(viewNoteData.created_at).format("h:mm A · MMM D, YYYY")} ·
+        ReactJS Assessment{" "}
+        {viewNoteData.updated_at != null
+          ? `· Last Edited: ${dayjs(viewNoteData.created_at).format(
+              "MMM D, YYYY h:mm A"
+            )}`
+          : null}
       </div>
       <div className="border-y-[1px] border-y-slate-700 py-4 flex flex-row justify-around">
-        <div className="hover:text-slate-400 cursor-pointer">
+        <button
+          type="button"
+          onClick={(e) => {
+            editNote(e, id);
+          }}
+          className="hover:text-slate-400 cursor-pointer"
+        >
           <FontAwesomeIcon icon="pen" />
-        </div>
-        <div
+        </button>
+        <button
+          type="button"
           className="hover:text-slate-400 cursor-pointer"
           onClick={() => setDeleteModal(true)}
         >
           <FontAwesomeIcon icon="trash-can" />
-        </div>
+        </button>
       </div>
-      <Modal
-        isModalOpen={deleteModal}
+      <DeleteModal
+        deleteModal={deleteModal}
         handleClose={handleClose}
-        enableClickAway={true}
-      >
-        <div className="mb-4 text-lg">Are you sure to delete this note?</div>
-        <div className="flex flex-row mt-2 justify-between">
-          <button
-            className="w-[48%] rounded-full py-2 text-black font-bold bg-slate-300 hover:bg-slate-400"
-            onClick={handleClose}
-          >
-            Close
-          </button>
-          <button
-            className="w-[48%] rounded-full py-2 text-white font-bold bg-red-600 hover:bg-red-700"
-          >
-            Yes, Delete
-          </button>
-        </div>
-      </Modal>
+        uid={id}
+      />
     </div>
   );
 };

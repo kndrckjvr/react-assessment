@@ -22,7 +22,7 @@ const Search = () => {
           onChange={(e) => {
             setSearch(e.target.value);
           }}
-          placeholder="Type here"
+          placeholder="Search title here"
           className="input w-full"
         />
       </div>
