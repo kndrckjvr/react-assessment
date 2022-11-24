@@ -7,7 +7,7 @@ const NotFound = () => {
 
         <div className="mt-4 hover:underline">
             <Link to="/">
-                back to home.
+                &lt; back to home.
             </Link>
         </div>
     </div>

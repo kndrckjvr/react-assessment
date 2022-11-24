@@ -29,7 +29,7 @@ const Sidebar = () => {
   return (
     <>
       <div className="bg-black sticky top-0 h-screen basis-1/4 border-r-[1px] border-r-slate-700">
-        <div className="w-3/4 ml-auto">
+        <div className="w-3/4 ml-auto flex flex-col">
           <ul className="mt-4 mb-4">
             {links.map((link, index) => (
               <SidebarLinks
@@ -41,7 +41,7 @@ const Sidebar = () => {
             ))}
           </ul>
           <button
-            className="py-2 w-[95%] rounded-full mx-auto font-bold bg-[#1d9bf0] hover:bg-[#1a8cd8]"
+            className="py-4 w-11/12 rounded-full font-bold bg-[#1d9bf0] hover:bg-[#1a8cd8] self-center"
             onClick={createNewPost}
           >
             Create New

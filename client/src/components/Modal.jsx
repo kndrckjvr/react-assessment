@@ -16,7 +16,7 @@ const Modal = ({ isModalOpen, handleClose, enableClickAway, children }) => {
         "modal-open": isModalOpen,
       })}
     >
-      <div className="modal-box relative flex flex-col bg-black" ref={modalRef}>
+      <div className="modal-box relative flex flex-col bg-black shadow-md shadow-slate-500" ref={modalRef}>
         {children}
       </div>
     </section>

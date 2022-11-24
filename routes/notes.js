@@ -29,10 +29,11 @@ router.get("/", async (request, response) => {
     };
 
     if (request.query.search) {
-        find.title = `/${request.query.search}/`;
+      find.title = {
+        $regex: `.*${request.query.search}.*`,
+        $options: 'i'
+      };
     }
-
-    console.log(find);
 
     const notes = await Note.find(find).sort({ created_at: -1 });
 
@@ -56,7 +57,6 @@ router.post("/", async (request, response) => {
     title: data.title,
     body: data.body,
   });
-  console.log("wat");
 
   try {
     const newNote = await note.save();

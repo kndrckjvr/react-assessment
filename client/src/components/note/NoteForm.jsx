@@ -1,57 +1,121 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRef } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useState } from "react";
+import classNames from "classnames";
 
 const NoteForm = ({ handleClose }) => {
-  let titleRef = useRef(null);
-  let bodyRef = useRef(null);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [titleError, setTitleError] = useState(false);
+  const [bodyError, setBodyError] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
 
   const submitForm = () => {
+    validateInputs();
+
+    if (titleError) {
+      toast.error("Title is required.");
+      return;
+    }
+
+    if (bodyError) {
+      toast.error("Word Limit has been reached.");
+      return;
+    }
+
     axios({
       method: "post",
       url: "/api/notes",
       data: {
-        title: titleRef.current.value,
-        body: bodyRef.current.value,
+        title: title,
+        body: body,
       },
-    }).then((response) => {
-      resetForm();
-      toast.success("Note saved.");
-    }).catch((error) => {
-      console.log(error)
-      toast.error(error.response.data.message);
-    });
+    })
+      .then((response) => {
+        resetForm();
+        toast.success("Note saved.");
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
   };
 
   const resetForm = () => {
-    titleRef.current.value = "";
-    bodyRef.current.value = "";
+    setTitle("");
+    setBody("");
+    setWordCount(0);
+    setTitleError(false);
+    setBodyError(false);
+  };
+
+  const checkWordCount = (e) => {
+    let bodyValue = e.target.value;
+
+    setBody(bodyValue);
+    setWordCount(bodyValue === "" ? 0 : bodyValue.split(" ").length);
+  };
+
+  const validateInputs = () => {
+    setTitleError(!title);
+    setBodyError(!body || wordCount > 200);
   };
 
   return (
     <div>
-      <form className="w-full flex flex-col">
+      <form
+        className="w-full flex flex-col"
+        onBlur={() => {
+          setTitleError(false);
+          setBodyError(false);
+        }}
+      >
         <div className="mb-2">
           <div className="flex flex-row justify-between">
-            <p className="text-white font-semibold mb-2">Title</p>
-            <button className="cursor-pointer hover:font-bold mb-2" onClick={(e) => { e.preventDefault(); resetForm(); }}>
+            <label className="text-white font-semibold mb-2">Title</label>
+            <button
+              className="cursor-pointer hover:font-bold mb-2"
+              onClick={(e) => {
+                e.preventDefault();
+                resetForm();
+              }}
+            >
               <FontAwesomeIcon icon="trash-can" />
               <span className="px-3">Reset</span>
             </button>
           </div>
           <input
+            aria-label="Title"
             type="text"
-            ref={titleRef}
-            placeholder="Type here"
-            className="input w-full"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+            }}
+            placeholder="Type title here..."
+            className={classNames("input w-full", {
+              "input-error": titleError,
+            })}
           />
         </div>
         <div className="mb-2 w-full">
-          <p className="text-white font-semibold mb-2">Note</p>
+          <label className="text-white font-semibold mb-2 flex flex-row">
+            Note
+            <span
+              className={classNames("ml-auto text-xs self-center", {
+                "text-amber-600": wordCount >= 150,
+                "text-red-600": wordCount > 200,
+              })}
+            >
+              {wordCount}/200
+            </span>
+          </label>
           <textarea
-            className="textarea w-full"
-            ref={bodyRef}
+            aria-label="Type your notes here..."
+            className={classNames("textarea w-full", {
+              "input-error": bodyError,
+            })}
+            value={body}
+            onChange={(e) => checkWordCount(e)}
             placeholder="Bio"
           ></textarea>
         </div>

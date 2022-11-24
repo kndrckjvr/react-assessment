@@ -6,17 +6,16 @@ const Note = ({ uid, title, date, body, type }) => {
   const navigate = useNavigate();
   const viewNote = (e, uid) => {
     e.stopPropagation();
-    navigate(`/view/${uid}`)
+    navigate(`/view/${uid}`);
   };
 
   const editNote = (e, uid) => {
     e.stopPropagation();
-    navigate(`/view/${uid}`)
-  }
+    navigate(`/view/${uid}`);
+  };
 
   return (
-    <div
-      className="border-b-[1px] border-b-slate-700 p-3">
+    <div className="border-b-[1px] border-b-slate-700 p-3">
       <div className="flex flex-row">
         <img
           src={imagePlaceholder}
@@ -25,7 +24,12 @@ const Note = ({ uid, title, date, body, type }) => {
         />
         <div className="flex flex-col w-full">
           <div className="flex flex-row items-center ml-2">
-            <div className="text-s truncate max-w-[500px] hover:underline cursor-pointer" onClick={(e) => viewNote(e, uid)}>{title}</div>
+            <button
+              className="text-s truncate max-w-[500px] hover:underline cursor-pointer"
+              onClick={(e) => viewNote(e, uid)}
+            >
+              {title}
+            </button>
             <div className="px-2">·</div>
             <span className="text-xs font-bold text-slate-500">
               {dayjs(date).format("YYYY/MM/DD HH:mm:ss")}
@@ -46,13 +50,19 @@ const Note = ({ uid, title, date, body, type }) => {
                 tabIndex={0}
                 className="dropdown-content menu p-2 shadow bg-black rounded-box w-52 text-white"
               >
-              <li>
-                <button className="active:bg-slate-300" onClick={(e) => viewNote(e, uid)}>
-                  View
-                </button>
-              </li>
                 <li>
-                  <button className="active:bg-slate-300" onClick={(e) => editNote(e, uid)}>
+                  <button
+                    className="active:bg-slate-300"
+                    onClick={(e) => viewNote(e, uid)}
+                  >
+                    View
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="active:bg-slate-300"
+                    onClick={(e) => editNote(e, uid)}
+                  >
                     Edit
                   </button>
                 </li>

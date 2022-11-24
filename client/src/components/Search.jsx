@@ -8,7 +8,6 @@ const Search = () => {
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      console.log(`searching (${search})...`)
       setQuery(search);
     }, 500);
     return () => clearTimeout(timeOut);
